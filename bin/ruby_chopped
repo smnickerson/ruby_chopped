@@ -25,6 +25,10 @@ parser = OptionParser.new do |o|
   o.on('-a', '--all', 'select from all existing gems') do
     @options[:all_gems] = true
   end
+  # Option: ignore gems in specified file
+  o.on('-g', '--ignore [ignore_file]', 'ignore gems in specified file') do |f|
+    @options[:ignore_file] = f
+  end
 end
 parser.parse!
 

@@ -16,6 +16,12 @@ module RubyChopped
       @gem_pool = :popular
     end
     
+    if opts[:ignore_file]
+      @filename = opts[:ignore_file]
+    else
+      @filename = false
+    end
+    
     folder = opts[:name]
     if File.exist?(folder)
       unless opts[:force]
@@ -83,12 +89,21 @@ module RubyChopped
   def pick_gems(gems, limit)
     limit.to_i.times.collect do 
       g = gems.delete_at(rand(gems.size)) 
-
-      # Skip bundler and rails
-      if g.match(/bundler|rails/)
-        pick_gems(gems, 1).first
+      
+      if @filename # Skip all gems in ignore file plus bundler and rails
+        file = File.new(@filename, "r")
+        found = file.readlines.include?(g+"\n")
+        if found or g.match(/bundler|rails/)
+          pick_gems(gems, 1).first
+        else
+          g
+        end
       else
-        g
+        if g.match(/bundler|rails/) # Skip bundler and rails
+          pick_gems(gems, 1).first
+        else
+          g
+        end
       end
     end
   end
